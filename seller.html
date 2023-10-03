@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Profile</title>
+</head>
+<style>
+    /* seller.css */
+
+/* Apply styles to the seller info section */
+#seller-info {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #333;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Arial', sans-serif; /* Example font family */
+}
+
+/* Center the seller's name */
+#seller-info h1 {
+  font-size: 36px;
+  margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+  font-family: 'Cursive', cursive; /* Example font family */
+}
+#car-listings h1 {
+  font-size: 36px;
+  margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+  font-family: 'Cursive', cursive; /* Example font family */
+}
+/* Apply styles to car listings */
+.car-listing {
+  background: linear-gradient(135deg, #FFFFFF, #E0E0E0);
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Style car images */
+.car-listing img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+  border: 2px solid #FFA500;
+  border-radius: 8px;
+}
+
+/* Style car details */
+.car-listing p {
+  font-size: 18px;
+  color: #333;
+  margin: 10px 0;
+  font-family: 'Verdana', sans-serif; /* Example font family */
+}
+
+/* Add a hover effect to car listings */
+.car-listing:hover {
+  background: linear-gradient(135deg, #E0E0E0, #FFFFFF);
+  transform: translateY(-5px);
+  transition: background 0.3s, transform 0.3s;
+}
+#sellCarButton {
+    background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+
+    .review-button{
+        background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+    .review-button:hover{
+        background-color: #0056b3;
+    }
+</style>
+<body>
+    <div id="seller-info">
+        <!-- Seller's contact details, username, and other information will be displayed here -->
+    </div>
+
+    <div id="car-listings">
+        <!-- Car listings with images will be displayed here -->
+    </div>
+    <button id="sellCarButton">Sell a Car</button>
+
+    <script>
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = Number(urlParams.get('userId'));
+        console.log( userId)
+        fetch('http://localhost:4000/seller', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ userId }),
+})
+  .then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      throw new Error('Failed to fetch seller data');
+    }
+  })
+  .then((responseData) => {
+    console.log(responseData)
+    const user = responseData.user;
+    const contact_details = responseData.contact_details;
+    const sellerInfoContainer = document.getElementById("seller-info");
+            const sellerInfo = responseData.user
+            const sellerContact = responseData.user.contact_details;
+            
+
+            sellerInfoContainer.innerHTML = `
+                <h1>Seller Information</h1>
+                <p><strong>Name:</strong> ${sellerInfo.name}</p>
+                <p><strong>Username:</strong> ${sellerInfo.username}</p>
+                <p><strong>Email:</strong> ${sellerInfo.email}</p>
+                <p><strong>Phone:</strong> ${sellerContact.phone}</p>
+                <p><strong>Address:</strong> ${sellerContact.address}</p>
+                <p><strong>Country:</strong> ${sellerContact.country}</p>
+            `;
+       
+
+    // Now you can use 'user' and 'contact_details' as needed
+    // console.log(user);
+    // console.log(contact_details);
+    const carListingsContainer = document.getElementById("car-listings");
+            const carListings = responseData.cars;
+
+            carListingsContainer.innerHTML = `
+                <h1>Car Listings</h1>
+            `;
+
+            carListings.forEach((car) => {
+                const imageDataURL = `data:image/jpeg;base64,${arrayBufferToBase64(car.image.data)}`;
+
+                carListingsContainer.innerHTML += `
+                    <div class="car-listing">
+                        <img src="${imageDataURL}" alt="${car.brand} ${car.model}" width="200">
+                        <p><strong>Brand:</strong> ${car.brand}</p>
+                        <p><strong>Model:</strong> ${car.model}</p>
+                        <p><strong>Year:</strong> ${car.year}</p>
+                        <p><strong>Price:</strong> $${car.price}</p>
+                        <p><strong>Mileage:</strong> ${car.mileage} miles</p>
+                        <p><strong>Condition:</strong> ${car.condition}</p>
+                        <p><strong>Description:</strong> ${car.description}</p>
+                        <button class="review-button" data-carId="${car.id}">View Review</button>
+                    </div>
+                `;
+              const reviewButtons = document.querySelectorAll(".review-button");
+            reviewButtons.forEach((button) => {
+                button.addEventListener("click", redirectToReviewPage);
+            });
+
+            function redirectToReviewPage(event) {
+                const carId = event.target.getAttribute("data-carid");
+                window.location.href = `viewreview.html?carId=${carId}`;
+            }
+            });
+ 
+  })
+  .catch((error) => {
+    // Handle any network or fetch-related errors
+    console.error('Error:', error);
+  });
+
+       
+
+        // Helper function to convert ArrayBuffer to base64
+        function arrayBufferToBase64(buffer) {
+            const binary = new Uint8Array(buffer);
+            const bytes = [];
+            binary.forEach((byte) => {
+                bytes.push(String.fromCharCode(byte));
+            });
+            return btoa(bytes.join(""));
+        }
+        const sellCarButton = document.getElementById('sellCarButton');
+
+sellCarButton.addEventListener('click', () => {
+
+
+  // Redirect to sellcar.html with the sellerId as a query parameter
+  window.location.href = `sellcar.html?sellerId=${userId}`;
+});
+  
+    </script>
+</body>
+</html>

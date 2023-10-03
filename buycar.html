@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Listings</title>
+    <style>
+        /* CSS for the slide-over */
+        body {
+            font-family: Arial, sans-serif;
+            background:  #FFA500; /* Dark gradient background */
+            color: #ffffff; /* Text color */
+            text-align: center;
+            padding: 20px;
+            margin: 0; /* Remove default margin */
+            display: flex;
+            flex-direction: column; /* Display content vertically */
+            align-items: center; /* Center content horizontally */
+        }
+
+        /* Car listing card */
+        .car-listing {
+            background-color: #007bff; /* Dark background */
+            max-width: 300px;
+            width: 800px;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .car-listing h2 {
+            font-size: 24px;
+            color: #ffffff; /* Text color */
+            margin-bottom: 10px;
+        }
+
+        /* Slide-over */
+        .slide-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .car-details {
+            background-color: #ffffff; /* Light background */
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+
+        .car-details h2 {
+            font-size: 24px;
+            color: #333333; /* Dark text color */
+            margin-bottom: 10px;
+        }
+
+        .car-details p {
+            margin: 10px 0;
+            color: #333333; /* Dark text color */
+        }
+
+        /* Buy Car button */
+        #buy-car  {
+            background-color: #007bff; /* Blue color */
+            color: #ffffff; /* Text color */
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #back-button{
+            background-color: #007bff; /* Blue color */
+            color: #ffffff; /* Text color */
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        /* Car images */
+        .car-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+        .view-details{
+            background-color: #ffffff; /* Blue color */
+            color: #007bff; /* Text color */
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* Add your styles for car details here */
+    </style>
+</head>
+<body>
+    <!-- Car listings container -->
+    <div id="car-listings">
+        <!-- Car listings go here -->
+    </div>
+
+    <!-- Slide-over container -->
+    <div id="slide-over" class="slide-over">
+        <div class="car-details">
+            <!-- Display car details here -->
+            <h2>Car Details</h2>
+            <p><strong>Brand:</strong> <span id="brand"></span></p>
+            <p><strong>Model:</strong> <span id="model"></span></p>
+            <p><strong>Year:</strong> <span id="year"></span></p>
+            <p><strong>Price:</strong> $<span id="price"></span></p>
+            <p><strong>Mileage:</strong> <span id="mileage"></span> miles</p>
+            <button id="buy-car">Buy Car</button>
+            <button id="back-button">Back</button>
+        </div>
+    </div>
+
+    <script>
+        // Sample car data
+        
+            // Add more car objects here
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = Number(urlParams.get('buyerId'));
+        
+        fetch('http://localhost:4000/getcar', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ id }),
+})
+.then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      throw new Error('Failed to fetch seller data');
+    }
+  })
+  .then((responseData) => {
+        
+            const carListings = document.getElementById("car-listings");
+            responseData.forEach((cars, index) => {
+                const car=cars.car;
+                const carElement = document.createElement("div");
+                carElement.className = "car-listing";
+                carElement.innerHTML = `
+                    <h2>${car.brand} ${car.model}</h2>
+                    <p>Year: ${car.year}</p>
+                    <p>Price: $${car.price}</p>
+                    <button class="view-details" data-index="${index}">View Details</button>
+                    
+                `;
+                carListings.appendChild(carElement);
+                const carImage = document.createElement("img");
+                carImage.className="carDetailsContainer";
+    carImage.src = `data:image/jpeg;base64,${arrayBufferToBase64(car.image.data)}`;
+    carImage.alt = `${car.brand} ${car.model}`;
+    carImage.width = 200;
+    carListings.appendChild(carImage);
+            });
+            
+
+            // Add event listeners to "View Details" buttons
+            const viewDetailsButtons = document.querySelectorAll(".view-details");
+            viewDetailsButtons.forEach((button) => {
+                button.addEventListener("click", showCarDetails);
+            });
+          
+
+            function showCarDetails(event) {
+                const urlParams = new URLSearchParams(window.location.search);
+            const id = Number(urlParams.get('buyerId'));
+            console.log(id)
+            const index = event.target.getAttribute("data-index");
+            const car = responseData[index];
+            
+            const slideOver = document.getElementById("slide-over");
+
+            document.getElementById("brand").textContent = car.car.brand;
+            document.getElementById("model").textContent = car.car.model;
+            document.getElementById("year").textContent = car.car.year;
+            document.getElementById("price").textContent = car.car.price;
+            document.getElementById("mileage").textContent = car.car.mileage;
+
+            // Show the slide-over
+            slideOver.style.display = "block";
+            document.getElementById("back-button").addEventListener("click", function() {
+    const slideOver = document.getElementById("slide-over");
+    const carListingsContainer = document.getElementById("car-listings-container");
+
+    // Hide the detail view and show the car listings
+    slideOver.style.display = "none";
+    carListingsContainer.style.display = "block";
+});
+
+            // Add an event listener to the "Buy Car" button
+            const buyCarButton = document.getElementById("buy-car");
+            buyCarButton.addEventListener("click", async() => {
+                // Make an API request to buy the car
+                
+                    const buyerId=id;
+                    const carId=car.car.id
+                    console.log(carId)
+                    // Add buyer id here if available
+              
+                try {
+                // Make an API request to submit car details
+                const response = await fetch('http://localhost:4000/buycar', {
+                    method: 'POST',
+                    headers: {
+    'Content-Type': 'application/json',
+  },
+                    body: JSON.stringify({buyerId,carId}),
+                });
+
+                if (response.status === 201) {
+                    alert('Car buyed successfully');
+                    // Redirect to seller.html after successful submission
+                    window.location.href = `buyer.html?userId=${id}`;
+                } else {
+                    alert('Failed to buy car. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error while selling car:', error);
+                alert('An error occurred. Please try again later.');
+            }
+
+                // Make the API request here with carDetails
+                
+
+                // Close the slide-over
+                slideOver.style.display = "none";
+            });
+        }
+        });
+        function arrayBufferToBase64(buffer) {
+    const binary = new Uint8Array(buffer);
+    const bytes = [];
+    binary.forEach((byte) => {
+        bytes.push(String.fromCharCode(byte));
+    });
+    return btoa(bytes.join(""));
+}
+
+
+        // Display cars on page load
+       
+    </script>
+</body>
+</html>

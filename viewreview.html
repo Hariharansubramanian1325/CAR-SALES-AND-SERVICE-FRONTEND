@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #F5F5F5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        #reviews-container {
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 20px;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .review-item {
+            border: 1px solid #E0E0E0;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .satisfaction-satisfied {
+            color: green;
+            font-weight: bold;
+        }
+
+        .satisfaction-not-satisfied {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Car Reviews</h1>
+
+    <div id="reviews-container">
+        <!-- Reviews will be displayed here -->
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const carId = Number(urlParams.get('carId'));
+
+        // Send an API request to fetch reviews for the specified carId
+        fetch(`http://localhost:4000/getreview`, {
+                method: 'POST', // Use GET method to fetch service information
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ carId }),
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to fetch reviews');
+                }
+            })
+            .then((reviews) => {
+                const reviewsContainer = document.getElementById('reviews-container');
+
+                if (reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<p>No reviews available for this car.</p>';
+                } else {
+                    reviews.forEach((review) => {
+                        const reviewItem = document.createElement('div');
+                        reviewItem.classList.add('review-item');
+
+                        // Determine satisfaction class based on the "satisfaction" value
+                        const satisfactionClass =
+                            review.satisfaction === 'satisfied'
+                                ? 'satisfaction-satisfied'
+                                : 'satisfaction-not-satisfied';
+
+                        reviewItem.innerHTML = `
+                            <p><strong>Satisfaction:</strong> <span class="${satisfactionClass}">${review.satisfaction}</span></p>
+                            <p><strong>Description:</strong> ${review.description}</p>
+                        `;
+
+                        reviewsContainer.appendChild(reviewItem);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error('Error while fetching reviews:', error);
+                const reviewsContainer = document.getElementById('reviews-container');
+                reviewsContainer.innerHTML = '<p>An error occurred while fetching reviews.</p>';
+            });
+    </script>
+</body>
+</html>

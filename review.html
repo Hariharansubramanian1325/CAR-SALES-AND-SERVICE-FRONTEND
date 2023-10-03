@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Review</title>
+</head>
+<style>
+    body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #reviewForm {
+            background-color: #fff;
+            border-radius: 10px;
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        select {
+            height: 40px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+</style>
+<body>
+    <h1>Car Review</h1>
+
+    <form id="reviewForm">
+        
+        <label for="satisfaction">Satisfaction:</label>
+        <select id="satisfaction" name="satisfaction" required>
+            <option value="satisfied">Satisfied</option>
+            <option value="not-satisfied">Not Satisfied</option>
+        </select><br>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" rows="4" required></textarea><br>
+
+        <input type="submit" value="Submit Review">
+    </form>
+
+    <script>
+        const reviewForm = document.getElementById('reviewForm');
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+        const carId = urlParams.get('carId');
+            var satisfaction=document.getElementById('satisfaction').value;
+            var description=document.getElementById('description').value;
+            console.log(typeof descripton);
+            
+
+            try {
+                // Send the review data to the API using Fetch
+                const response = await fetch('http://localhost:4000/addreview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({carId,satisfaction,description}),
+                });
+
+                if (response.status === 201) {
+                    alert('Review submitted successfully');
+                    // Optionally, you can redirect to a thank you page or perform other actions
+                } else {
+                    alert('Failed to submit review. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error while submitting review:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Profile</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background: #FFA500;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+#buyer-info, #cars-list {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    margin: 0 auto; 
+    margin-top: 10px;/* Center the element horizontally */
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+h1, h2 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    color: #000000; /* Green for headings */
+    margin-bottom: 20px;
+}
+
+p {
+    margin: 10px 0;
+}
+
+#buyer-info p {
+    color: #333; 
+}
+#buyCarButton {
+    background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+
+    #buyCarButton:hover {
+        background-color: #0056b3;
+    }
+    .service-button{
+        background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+    .service-button:hover{
+        background-color: #0056b3;
+    }
+    #serviceInfoButton{
+        background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+    #serviceInfoButton:hover{
+        background-color: #0056b3;
+    }
+    .review-button{
+        background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+    }
+    .review-button:hover{
+        background-color: #0056b3;
+    }
+
+    </style>
+</head>
+<body>
+    <h1>Buyer Profile</h1>
+
+    <div id="buyer-info">
+        <!-- Buyer's contact details, username, and other information will be displayed here -->
+        <!-- <button id="serviceInfoButton">Service Info</button> -->
+    </div>
+
+    <div id="cars-list">
+        <!-- Purchased car details will be displayed here -->
+    </div><br>
+    <button id="buyCarButton">Buy a Car</button>
+    <br>
+    
+    <script>
+        // Sample data received from the backend
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = Number(urlParams.get('userId'));
+        console.log( id)
+        fetch('http://localhost:4000/buyer', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ id }),
+})
+.then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      throw new Error('Failed to fetch seller data');
+    }
+  })
+  .then((responseData) => {
+        // Function to display the buyer's information
+       
+            const buyerInfoContainer = document.getElementById("buyer-info");
+            const buyerInfo = responseData.user;
+            const buyerContact = responseData.user.contact_details;
+
+            buyerInfoContainer.innerHTML = `
+                <h2>Buyer Information</h2>
+                <p><strong>Name:</strong> ${buyerInfo.name}</p>
+                <p><strong>Username:</strong> ${buyerInfo.username}</p>
+                <p><strong>Email:</strong> ${buyerInfo.email}</p>
+                <p><strong>Phone:</strong> ${buyerContact.phone}</p>
+                <p><strong>Address:</strong> ${buyerContact.address}</p>
+                <p><strong>Country:</strong> ${buyerContact.country}</p>
+                <button id="serviceInfoButton">Service Info</button>
+                
+                
+            `;
+
+       
+            const carsListContainer = document.getElementById("cars-list");
+            const purchasedCars = responseData.cars;
+
+            carsListContainer.innerHTML = `
+                <h2>Purchased Cars</h2>
+            `;
+            var carid;
+            purchasedCars.forEach((car) => {
+                carsListContainer.innerHTML += `
+                    <div class="car-details">
+                        <h3>${car.car.brand} ${car.car.model}</h3>
+                        <p><strong>Year:</strong> ${car.car.year}</p>
+                        <p><strong>Mileage:</strong> ${car.car.mileage} miles</p>
+                        <p><strong>Price:</strong> $${car.car.price}</p>
+                        <button class="service-button" data-carId="${car.car.cid}">Request Service</button>
+                        <button class="review-button" data-carId="${car.car.cid}">Add Review</button>
+                    </div>
+
+                `;
+                carid=car.id;
+                console.log(carid)
+            });
+            const serviceButtons = document.querySelectorAll(".service-button");
+            serviceButtons.forEach((button) => {
+                button.addEventListener("click", redirectToServicePage);
+            });
+
+            function redirectToServicePage(event) {
+                const carId = event.target.getAttribute("data-carid");
+                window.location.href = `service.html?carId=${carId}&buyerId=${id}`;
+            }
+            const reviewButtons = document.querySelectorAll(".review-button");
+            reviewButtons.forEach((button) => {
+                button.addEventListener("click", redirectToReviewPage);
+            });
+
+            function redirectToReviewPage(event) {
+                const carId = event.target.getAttribute("data-carid");
+                window.location.href = `review.html?carId=${carId}&buyerId=${id}`;
+            }
+            const serviceInfoButton = document.getElementById("serviceInfoButton");
+    serviceInfoButton.addEventListener("click", () => {
+        // Redirect to serviceinfo.html with the buyerId as a query parameter
+        window.location.href = `serviceinfo.html?buyerId=${id}`;
+    });
+
+            
+        }
+
+        // Call functions to display buyer info and purchased car details
+    );
+    buyCarButton.addEventListener('click', () => {
+
+
+// Redirect to sellcar.html with the sellerId as a query parameter
+window.location.href = `buycar.html?buyerId=${id}`;
+
+});
+
+// document.addEventListener("DOMContentLoaded", () => {
+//         // Your JavaScript code here, including adding the event listener
+//         const serviceInfoButton = document.getElementById("serviceInfoButton");
+//         serviceInfoButton.addEventListener("click", () => {
+//             // Redirect to serviceinfo.html with the buyerId as a query parameter
+//             window.location.href = `serviceinfo.html?buyerId=${id}`;
+//         });
+//     });
+        
+    </script>
+</body>
+</html>
