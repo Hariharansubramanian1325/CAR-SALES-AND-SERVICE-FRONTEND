@@ -60,7 +60,7 @@
         const carId = Number(urlParams.get('carId'));
 
         // Send an API request to fetch reviews for the specified carId
-        fetch(`http://localhost:4000/getreview`, {
+        fetch(`https://car-sales-and-service-backend.vercel.app/getreview`, {
                 method: 'POST', // Use GET method to fetch service information
                 headers: {
                     'Content-Type': 'application/json',

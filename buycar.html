@@ -134,7 +134,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const id = Number(urlParams.get('buyerId'));
         
-        fetch('http://localhost:4000/getcar', {
+        fetch("https://car-sales-and-service-backend.vercel.app/getcar", {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -217,7 +217,7 @@
               
                 try {
                 // Make an API request to submit car details
-                const response = await fetch('http://localhost:4000/buycar', {
+                const response = await fetch('https://car-sales-and-service-backend.vercel.app/buycar', {
                     method: 'POST',
                     headers: {
     'Content-Type': 'application/json',

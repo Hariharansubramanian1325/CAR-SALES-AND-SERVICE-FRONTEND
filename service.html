@@ -86,7 +86,7 @@
         var appointment_date=document.getElementById('appointmentDate').value;
         try {
                
-                const response = await fetch('http://localhost:4000/addservice', {
+                const response = await fetch('https://car-sales-and-service-backend.vercel.app/addservice', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -119,7 +119,7 @@
         async function populateProviderDropdown() {
             try {
                 // Fetch the list of service providers from the API
-                const response = await fetch('http://localhost:4000/reqservice', {
+                const response = await fetch('https://car-sales-and-service-backend.vercel.app/reqservice', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -126,7 +126,7 @@
 
             try {
                 // Make an API request to submit car details
-                const response = await fetch('http://localhost:4000/sellcar', {
+                const response = await fetch('https://car-sales-and-service-backend.vercel.app/sellcar', {
                     method: 'POST',
                     body: formData,
                 });
